@@ -13,13 +13,11 @@ class Preprocessor:
     def get_image_paths(self):
         image_paths = []
         for subdirectory in self.INTEL_SUBDIRECTORIES:
-            print("Current subdirectory:", subdirectory)
             if subdirectory == "seg_pred/seg_pred/":
                 SUBDIRECTORY_PATH = self.INTEL_BASE_DIR + subdirectory
                 image_paths += map(lambda path: SUBDIRECTORY_PATH + path, os.listdir(SUBDIRECTORY_PATH))
             else:
                 for class_subdirectory in self.INTEL_TRAIN_TEST_SUBDIRECTORIES:
-                    print("Current class subdirectory:", class_subdirectory)
                     SUBDIRECTORY_PATH = self.INTEL_BASE_DIR + subdirectory + class_subdirectory
                     image_paths += map(lambda path: SUBDIRECTORY_PATH + path, os.listdir(SUBDIRECTORY_PATH))
         return image_paths
@@ -28,7 +26,6 @@ class Preprocessor:
         return input_images[:,:,:,0]
 
     def get_data(self, image_paths):
-        print("Start getting data")
         X = []
         for i, image_path in enumerate(image_paths):
             image = Image.open(image_path)
@@ -52,6 +49,4 @@ if __name__ == '__main__':
     preprocessor = Preprocessor()
     image_paths = preprocessor.get_image_paths()
     X, y = preprocessor.get_data(image_paths=image_paths)
-    print("X shape:", X.shape)
-    print("y shape:", y.shape)
     preprocessor.write_data(X, y)
