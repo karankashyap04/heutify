@@ -29,7 +29,7 @@ class MultinomialCrossEntropyLoss:
         v = []
         for row_idx in range(image.shape[0]):
             for col_idx in range(image.shape[1]):
-                v.append(self.v(input=image[row_idx, col_idx, :]))
+                v.append(self.v(Z=image[row_idx, col_idx, :], w=self.w))
         return tf.convert_to_tensor(v, dtype=tf.float32)
 
     def loss(self, y_preds, y_true):
