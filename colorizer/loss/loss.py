@@ -99,7 +99,7 @@ class MultinomialCrossEntropyLoss:
         batch_bin_distribution = tf.convert_to_tensor(batch_bin_distribution, dtype=tf.float32)
         return batch_bin_distribution
 
-    def v(self, Z, w):
+    def v_pixel(self, Z, w):
         # Note: Here, Z is the soft-encoding vector representation of some label
         # Note: Z will be a tensor
         # Note: this computes the v value for a single pixel
@@ -110,7 +110,7 @@ class MultinomialCrossEntropyLoss:
         v = []
         for row_idx in range(image.shape[0]):
             for col_idx in range(image.shape[1]):
-                v.append(self.v(Z=image[row_idx, col_idx, :], w=self.w))
+                v.append(self.v_pixel(Z=image[row_idx, col_idx, :], w=self.w))
         return tf.convert_to_tensor(v, dtype=tf.float32)
 
     def loss(self, y_preds, y_true):
