@@ -5,6 +5,8 @@ class CNNModel:
         self.classes_count = classes_count
 
     def get_cnn_colorizer_model(self):
+        # TODO: Might need to change the strides value of all the Conv2DTranspose layers to 1 because the
+        # output shapes seem to get quite messed up otherwise
         model = tf.keras.Sequential([
             tf.keras.layers.Conv2D(filters=64, kernel_size=3, strides=1, padding="same", activation="relu"),
             tf.keras.layers.Conv2D(filters=64, kernel_size=3, strides=1, padding="same", activation="relu"),

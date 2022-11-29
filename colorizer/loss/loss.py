@@ -113,7 +113,7 @@ class MultinomialCrossEntropyLoss:
                 v.append(self.v_pixel(Z=image[row_idx, col_idx, :], w=self.w))
         return tf.convert_to_tensor(v, dtype=tf.float32)
 
-    def loss(self, y_preds, y_true):
+    def loss(self, y_true, y_preds):
         # Might want to do y_true = y_true[:,:,:,1:] to remove L and have only a, b
         y_true_ab = y_true[:,:,:,1:]
         Z = self.get_batch_bin_distribution(y_true_ab)
