@@ -5,20 +5,26 @@ import tensorflow_probability as tfp
 tfd = tfp.distributions
 
 class MultinomialCrossEntropyLoss:
-    def __init__(self):
+    def __init__(self, y_true):
         self.LAMBDA = 0.5 # Value suggested in the paper
         self.SIGMA = 5 # Value suggested in the paper
-        # TODO: Fill these out
-        self.p = None # This will store the bin distribution for all the bins
-        # for every image in the training data (can probably do this using the get_batch_bin_distribution function)
-        self.w = self.initialize_pixel_weights() # Store weighted factors for pixels based on ab bin distribution
 
         # TODO: Fill these out
-        self.a_minimum, self.a_maximum = None, None
-        self.b_minimum, self.b_maximum = None, None
-        self.a_num_partitions, self.b_num_partitions = None, None # I think each of these should be 23 so that self.Q can be self.a_num_partitions * self.b_num_partitions
+        # self.a_minimum, self.a_maximum = None, None
+        # self.b_minimum, self.b_maximum = None, None
+        self.a_minimum, self.a_maximum = -110, 110
+        print("self.a_minimum:", self.a_minimum)
+        self.b_minimum, self.b_maximum = -110, 110
+        # self.a_num_partitions, self.b_num_partitions = None, None # I think each of these should be 23 so that self.Q can be self.a_num_partitions * self.b_num_partitions
+        self.a_num_partitions, self.b_num_partitions = 23, 23
 
         self.Q = 23 ** 2 # We had done 23 x 23 for the Lab colorspace in our model; can change if required
+
+        # TODO: Fill these out
+        # self.p = None # This will store the bin distribution for all the bins
+        # for every image in the training data (can probably do this using the get_batch_bin_distribution function)
+        self.p = self.get_batch_bin_distribution(y_true)
+        self.w = self.initialize_pixel_weights() # Store weighted factors for pixels based on ab bin distribution
     
 
     def initialize_bin_distribution(self):
@@ -37,7 +43,8 @@ class MultinomialCrossEntropyLoss:
         # Convert single pixel a, b to bin id (a_bin, b_bin)
         a_bin = (a - self.a_minimum) / (self.a_maximum - self.a_minimum) * self.a_num_partitions
         b_bin = (b - self.b_minimum) / (self.b_maximum - self.b_minimum) * self.b_num_partitions
-        return round(a_bin), round(b_bin)
+        # return round(a_bin), round(b_bin)
+        return round(a_bin.numpy()), round(b_bin.numpy())
     
     def bin_to_discrete_ab(self, a_bin, b_bin):
         # For a single pixel
@@ -115,6 +122,8 @@ class MultinomialCrossEntropyLoss:
 
     def loss(self, y_true, y_preds):
         # Might want to do y_true = y_true[:,:,:,1:] to remove L and have only a, b
+        # ADDING A NEW LINE HERE FOR NOW:
+        # self.p = self.get_batch_bin_distribution(y_true)
         y_true_ab = y_true[:,:,:,1:]
         Z = self.get_batch_bin_distribution(y_true_ab)
         v = []
