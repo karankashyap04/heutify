@@ -24,6 +24,7 @@ class MultinomialCrossEntropyLoss:
         # self.p = None # This will store the bin distribution for all the bins
         # for every image in the training data (can probably do this using the get_batch_bin_distribution function)
         self.p = self.get_batch_bin_distribution(y_true)
+        print("begin self.w initialization")
         self.w = self.initialize_pixel_weights() # Store weighted factors for pixels based on ab bin distribution
     
 
@@ -87,23 +88,30 @@ class MultinomialCrossEntropyLoss:
         nearest_abs = self.get_nearest_discrete_ab(a, b)
         gaussian_distribution = tfd.Normal(loc=0, scale=5.)
         pixel_bin_distribution = tf.zeros(shape=(self.a_num_partitions, self.b_num_partitions), dtype=tf.float32)
+        # pixel_bin_distribution = tf.Variable(pixel_bin_distribution, trainable=False)
+        pixel_bin_distribution_np = pixel_bin_distribution.numpy()
         for dist, _, bin_ids in nearest_abs:
-            pixel_bin_distribution[bin_ids[0]][bin_ids[1]] = gaussian_distribution.prob(dist)
+            pixel_bin_distribution_np[bin_ids[0]][bin_ids[1]] = gaussian_distribution.prob(dist)
+            # pixel_bin_distribution = pixel_bin_distribution[bin_ids[0]][bin_ids[1]].assign(gaussian_distribution.prob(dist))
+        pixel_bin_distribution = tf.convert_to_tensor(pixel_bin_distribution_np)
         pixel_bin_distribution = tf.reshape(pixel_bin_distribution, shape=(self.Q))
         return pixel_bin_distribution
     
     def get_image_bin_distribution(self, image):
+        print("begin image bin distribution")
         flattened_image = tf.reshape(image, shape=(-1, 2))
         image_bin_distribution = tf.map_fn(lambda pixel: self.get_pixel_bin_distribution(pixel[0], pixel[1]), elems=flattened_image)
         image_bin_distribution = tf.reshape(image_bin_distribution, shape=image.shape)
         return image_bin_distribution
     
     def get_batch_bin_distribution(self, y_true):
+        print("begin get batch bin distribution")
         batch_bin_distribution = []
         for image in y_true:
             image_bin_distribution = self.get_image_bin_distribution(image=image)
             batch_bin_distribution.append(image_bin_distribution)
         batch_bin_distribution = tf.convert_to_tensor(batch_bin_distribution, dtype=tf.float32)
+        print("finish batch bin distribution")
         return batch_bin_distribution
 
     def v_pixel(self, Z, w):
