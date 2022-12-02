@@ -3,6 +3,7 @@ import numpy as np
 from scipy import ndimage
 import tensorflow_probability as tfp
 tfd = tfp.distributions
+import pickle
 
 class MultinomialCrossEntropyLoss:
     def __init__(self, y_true):
@@ -19,6 +20,8 @@ class MultinomialCrossEntropyLoss:
         self.a_num_partitions, self.b_num_partitions = 23, 23
 
         self.Q = 23 ** 2 # We had done 23 x 23 for the Lab colorspace in our model; can change if required
+        self.ab_to_bin_distribution = dict()
+        self.initialize_ab_to_bin_distribution()
 
         # TODO: Fill these out
         # self.p = None # This will store the bin distribution for all the bins
@@ -28,13 +31,23 @@ class MultinomialCrossEntropyLoss:
         self.w = self.initialize_pixel_weights() # Store weighted factors for pixels based on ab bin distribution
     
 
-    def initialize_bin_distribution(self):
-        # TODO: Initialize the value of self.p here
-        pass
+    def initialize_ab_to_bin_distribution(self):
+        print("Start")
+        for a_idx, a in enumerate(range(self.a_minimum, self.a_maximum + 1)):
+            for b_idx, b in enumerate(range(self.b_minimum, self.b_maximum + 1)):
+                self.ab_to_bin_distribution[(a,b)] = self.get_pixel_bin_distribution(a,b)
+            print(f"Completed {a_idx}")
+        print("Finish")
+        print("Write to pkl file:")
+        with open('ab_to_bin_distribution.pkl', 'wb+') as f:
+            pickle.dump(self.ab_to_bin_distribution, f)
+        print("Done writing file")
     
     def initialize_pixel_weights(self):
         w = ((1 - self.LAMBDA) * self.p) + (self.LAMBDA / self.Q)
         w = tf.math.reciprocal(w)
+        print("w shape:", w.shape)
+        print("self.p shape:", self.p.shape)
         expected_w = np.tensordot(self.p, w)
         output = w / expected_w
         return ndimage.gaussian_filter(input=output, sigma=self.SIGMA)
@@ -42,10 +55,10 @@ class MultinomialCrossEntropyLoss:
 
     def ab_to_discrete_bin(self, a, b):
         # Convert single pixel a, b to bin id (a_bin, b_bin)
-        a_bin = (a - self.a_minimum) / (self.a_maximum - self.a_minimum) * self.a_num_partitions
-        b_bin = (b - self.b_minimum) / (self.b_maximum - self.b_minimum) * self.b_num_partitions
-        # return round(a_bin), round(b_bin)
-        return round(a_bin.numpy()), round(b_bin.numpy())
+        a_bin = (a - self.a_minimum) / (self.a_maximum - self.a_minimum) * (self.a_num_partitions - 1)
+        b_bin = (b - self.b_minimum) / (self.b_maximum - self.b_minimum) * (self.b_num_partitions - 1)
+        return round(a_bin), round(b_bin)
+        # return round(a_bin.numpy()), round(b_bin.numpy())
     
     def bin_to_discrete_ab(self, a_bin, b_bin):
         # For a single pixel
@@ -85,6 +98,7 @@ class MultinomialCrossEntropyLoss:
         return nearest_abs[:5] # Returning 5 nearest points along with distances and bin ids
     
     def get_pixel_bin_distribution(self, a, b):
+        a, b = round(a), round(b)
         nearest_abs = self.get_nearest_discrete_ab(a, b)
         gaussian_distribution = tfd.Normal(loc=0, scale=5.)
         pixel_bin_distribution = tf.zeros(shape=(self.a_num_partitions, self.b_num_partitions), dtype=tf.float32)
@@ -95,13 +109,20 @@ class MultinomialCrossEntropyLoss:
             # pixel_bin_distribution = pixel_bin_distribution[bin_ids[0]][bin_ids[1]].assign(gaussian_distribution.prob(dist))
         pixel_bin_distribution = tf.convert_to_tensor(pixel_bin_distribution_np)
         pixel_bin_distribution = tf.reshape(pixel_bin_distribution, shape=(self.Q))
+        self.ab_to_bin_distribution[(a,b)] = pixel_bin_distribution
         return pixel_bin_distribution
     
+    # @tf.function
     def get_image_bin_distribution(self, image):
         print("begin image bin distribution")
+        print("image shape:", image.shape)
         flattened_image = tf.reshape(image, shape=(-1, 2))
-        image_bin_distribution = tf.map_fn(lambda pixel: self.get_pixel_bin_distribution(pixel[0], pixel[1]), elems=flattened_image)
-        image_bin_distribution = tf.reshape(image_bin_distribution, shape=image.shape)
+        print("pixel[0]", flattened_image[0][0])
+        image_bin_distribution = tf.map_fn(lambda pixel: self.get_pixel_bin_distribution(pixel[0].numpy(), pixel[1].numpy()), elems=flattened_image)
+        print("image_bin_distribution shape:", image_bin_distribution.shape)
+        print("desired shape:", (-1, image.shape[0], image.shape[1], image))
+        # image_bin_distribution = tf.reshape(image_bin_distribution, shape=image.shape)
+        image_bin_distribution = tf.reshape(image_bin_distribution, shape=(-1, image.shape[0], image.shape[1], self.Q))
         return image_bin_distribution
     
     def get_batch_bin_distribution(self, y_true):
