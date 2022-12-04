@@ -26,29 +26,33 @@ class MultinomialCrossEntropyLoss:
         # TODO: Fill these out
         # self.p = None # This will store the bin distribution for all the bins
         # for every image in the training data (can probably do this using the get_batch_bin_distribution function)
-        self.p = self.get_batch_bin_distribution(y_true)
+        self.p = tf.reduce_sum(self.get_batch_bin_distribution(y_true), axis=(0,1,2))
         print("begin self.w initialization")
         self.w = self.initialize_pixel_weights() # Store weighted factors for pixels based on ab bin distribution
     
 
     def initialize_ab_to_bin_distribution(self):
         print("Start")
-        for a_idx, a in enumerate(range(self.a_minimum, self.a_maximum + 1)):
-            for b_idx, b in enumerate(range(self.b_minimum, self.b_maximum + 1)):
-                self.ab_to_bin_distribution[(a,b)] = self.get_pixel_bin_distribution(a,b)
-            print(f"Completed {a_idx}")
-        print("Finish")
-        print("Write to pkl file:")
-        with open('ab_to_bin_distribution.pkl', 'wb+') as f:
-            pickle.dump(self.ab_to_bin_distribution, f)
-        print("Done writing file")
+        # for a_idx, a in enumerate(range(self.a_minimum, self.a_maximum + 1)):
+        #     for b_idx, b in enumerate(range(self.b_minimum, self.b_maximum + 1)):
+        #         self.ab_to_bin_distribution[(a,b)] = self.get_pixel_bin_distribution(a,b)
+        #     print(f"Completed {a_idx}")
+        # print("Finish")
+        # print("Write to pkl file:")
+        # with open('ab_to_bin_distribution.pkl', 'wb+') as f:
+        #     pickle.dump(self.ab_to_bin_distribution, f)
+        # print("Done writing file")
+        with open('ab_to_bin_distribution.pkl', 'rb') as f:
+            self.ab_to_bin_distribution = pickle.load(f)
+        print("Done loading file")
     
     def initialize_pixel_weights(self):
         w = ((1 - self.LAMBDA) * self.p) + (self.LAMBDA / self.Q)
         w = tf.math.reciprocal(w)
         print("w shape:", w.shape)
         print("self.p shape:", self.p.shape)
-        expected_w = np.tensordot(self.p, w)
+        # expected_w = np.tensordot(self.p, w)
+        expected_w = np.dot(self.p, w)
         output = w / expected_w
         return ndimage.gaussian_filter(input=output, sigma=self.SIGMA)
 
@@ -117,22 +121,27 @@ class MultinomialCrossEntropyLoss:
         print("begin image bin distribution")
         print("image shape:", image.shape)
         flattened_image = tf.reshape(image, shape=(-1, 2))
+        print("flattened image shape:", flattened_image.shape)
         print("pixel[0]", flattened_image[0][0])
         image_bin_distribution = tf.map_fn(lambda pixel: self.get_pixel_bin_distribution(pixel[0].numpy(), pixel[1].numpy()), elems=flattened_image)
         print("image_bin_distribution shape:", image_bin_distribution.shape)
-        print("desired shape:", (-1, image.shape[0], image.shape[1], image))
+        # print("desired shape:", (-1, image.shape[0], image.shape[1], image))
         # image_bin_distribution = tf.reshape(image_bin_distribution, shape=image.shape)
-        image_bin_distribution = tf.reshape(image_bin_distribution, shape=(-1, image.shape[0], image.shape[1], self.Q))
+        # image_bin_distribution = tf.reshape(image_bin_distribution, shape=(-1, image.shape[0], image.shape[1], self.Q))
+        image_bin_distribution = tf.reshape(image_bin_distribution, shape=(image.shape[0], image.shape[1], self.Q))
+        # image_bin_distribution = tf.reduce_sum(image_bin_distribution, axis=(0,1,2))
         return image_bin_distribution
     
     def get_batch_bin_distribution(self, y_true):
         print("begin get batch bin distribution")
         batch_bin_distribution = []
         for image in y_true:
+            print("image shape: ", image.shape)
             image_bin_distribution = self.get_image_bin_distribution(image=image)
             batch_bin_distribution.append(image_bin_distribution)
         batch_bin_distribution = tf.convert_to_tensor(batch_bin_distribution, dtype=tf.float32)
         print("finish batch bin distribution")
+        print("batch bin distribution shape:", batch_bin_distribution.shape)
         return batch_bin_distribution
 
     def v_pixel(self, Z, w):
@@ -143,26 +152,36 @@ class MultinomialCrossEntropyLoss:
     
     def v_image(self, image):
         # Compute v value for an entire image
+        print("v_image image shape:", image.shape)
         v = []
         for row_idx in range(image.shape[0]):
             for col_idx in range(image.shape[1]):
                 v.append(self.v_pixel(Z=image[row_idx, col_idx, :], w=self.w))
-        return tf.convert_to_tensor(v, dtype=tf.float32)
+        result = tf.convert_to_tensor(v, dtype=tf.float32)
+        print("result shape:", result.shape)
+        result = tf.reshape(result, shape=(image.shape[0], image.shape[1]))
+        print("reshaped result shape:", result.shape)
+        return result
 
     def loss(self, y_true, y_preds):
         # Might want to do y_true = y_true[:,:,:,1:] to remove L and have only a, b
         # ADDING A NEW LINE HERE FOR NOW:
         # self.p = self.get_batch_bin_distribution(y_true)
-        y_true_ab = y_true[:,:,:,1:]
-        Z = self.get_batch_bin_distribution(y_true_ab)
+        # y_true_ab = y_true[:,:,:,1:]
+        print("y_preds shape:", y_preds.shape)
+        Z = self.get_batch_bin_distribution(y_true)
         v = []
+        print("Z shape:", Z.shape)
         for image_idx in range(len(Z)):
             v.append(self.v_image(Z[image_idx,:,:,:]))
         v = tf.convert_to_tensor(v, dtype=tf.float32)
-        cce = tf.keras.losses.CategoricalCrossentropy()
-        crossentropy_loss = cce(Z, y_preds)
+        # cce = tf.keras.losses.CategoricalCrossentropy()
+        # crossentropy_loss = cce(Z, y_preds)
+        crossentropy_loss = tf.keras.losses.categorical_crossentropy(Z, y_preds)
         # Not 100% sure of axes on next line... think it should be 3 because the dot product
         # is across q in the formula (it is within the sum across h and w)
+        print("v shape:", v.shape)
+        print("crossentropy_loss shape:", crossentropy_loss.shape)
         product = tf.tensordot(v, crossentropy_loss, axes=3)
         loss = -product
         return loss
