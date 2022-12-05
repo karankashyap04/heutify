@@ -7,22 +7,21 @@ import pickle
 
 class MultinomialCrossEntropyLoss:
     def __init__(self, y_true):
-        self.LAMBDA = 0.5 # Value suggested in the paper
-        self.SIGMA = 5 # Value suggested in the paper
+        # self.LAMBDA = 0.5 # Value suggested in the paper
+        # self.SIGMA = 5 # Value suggested in the paper
 
-        # TODO: Fill these out
-        # self.a_minimum, self.a_maximum = None, None
-        # self.b_minimum, self.b_maximum = None, None
+        # # TODO: Fill these out
+        # # self.a_minimum, self.a_maximum = None, None
+        # # self.b_minimum, self.b_maximum = None, None
         self.a_minimum, self.a_maximum = -110, 110
-        print("self.a_minimum:", self.a_minimum)
+        # print("self.a_minimum:", self.a_minimum)
         self.b_minimum, self.b_maximum = -110, 110
-        # self.a_num_partitions, self.b_num_partitions = None, None # I think each of these should be 23 so that self.Q can be self.a_num_partitions * self.b_num_partitions
+        # # self.a_num_partitions, self.b_num_partitions = None, None # I think each of these should be 23 so that self.Q can be self.a_num_partitions * self.b_num_partitions
         self.a_num_partitions, self.b_num_partitions = 23, 23
 
         self.Q = 23 ** 2 # We had done 23 x 23 for the Lab colorspace in our model; can change if required
         self.ab_to_bin_distribution = dict()
         self.initialize_ab_to_bin_distribution()
-
 
         # TODO: Fill these out
         # self.p = None # This will store the bin distribution for all the bins
