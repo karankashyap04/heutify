@@ -7,28 +7,30 @@ import pickle
 
 class MultinomialCrossEntropyLoss:
     def __init__(self, y_true):
-        self.LAMBDA = 0.5 # Value suggested in the paper
-        self.SIGMA = 5 # Value suggested in the paper
+        # self.LAMBDA = 0.5 # Value suggested in the paper
+        # self.SIGMA = 5 # Value suggested in the paper
 
-        # TODO: Fill these out
-        # self.a_minimum, self.a_maximum = None, None
-        # self.b_minimum, self.b_maximum = None, None
-        self.a_minimum, self.a_maximum = -110, 110
-        print("self.a_minimum:", self.a_minimum)
-        self.b_minimum, self.b_maximum = -110, 110
-        # self.a_num_partitions, self.b_num_partitions = None, None # I think each of these should be 23 so that self.Q can be self.a_num_partitions * self.b_num_partitions
-        self.a_num_partitions, self.b_num_partitions = 23, 23
+        # # TODO: Fill these out
+        # # self.a_minimum, self.a_maximum = None, None
+        # # self.b_minimum, self.b_maximum = None, None
+        # self.a_minimum, self.a_maximum = -110, 110
+        # print("self.a_minimum:", self.a_minimum)
+        # self.b_minimum, self.b_maximum = -110, 110
+        # # self.a_num_partitions, self.b_num_partitions = None, None # I think each of these should be 23 so that self.Q can be self.a_num_partitions * self.b_num_partitions
+        # self.a_num_partitions, self.b_num_partitions = 23, 23
 
-        self.Q = 23 ** 2 # We had done 23 x 23 for the Lab colorspace in our model; can change if required
-        self.ab_to_bin_distribution = dict()
-        self.initialize_ab_to_bin_distribution()
+        # self.Q = 23 ** 2 # We had done 23 x 23 for the Lab colorspace in our model; can change if required
+        # self.ab_to_bin_distribution = dict()
+        # self.initialize_ab_to_bin_distribution()
 
-        # TODO: Fill these out
-        # self.p = None # This will store the bin distribution for all the bins
-        # for every image in the training data (can probably do this using the get_batch_bin_distribution function)
-        self.p = tf.reduce_sum(self.get_batch_bin_distribution(y_true), axis=(0,1,2))
-        print("begin self.w initialization")
-        self.w = self.initialize_pixel_weights() # Store weighted factors for pixels based on ab bin distribution
+
+        # # TODO: Fill these out
+        # # self.p = None # This will store the bin distribution for all the bins
+        # # for every image in the training data (can probably do this using the get_batch_bin_distribution function)
+        # self.p = tf.reduce_sum(self.get_batch_bin_distribution(y_true), axis=(0,1,2))
+        # print("begin self.w initialization")
+        # self.w = self.initialize_pixel_weights() # Store weighted factors for pixels based on ab bin distribution
+        self.initialize_bin_to_ab_array()
     
 
     def initialize_ab_to_bin_distribution(self):
@@ -45,6 +47,15 @@ class MultinomialCrossEntropyLoss:
         with open('ab_to_bin_distribution.pkl', 'rb') as f:
             self.ab_to_bin_distribution = pickle.load(f)
         print("Done loading file")
+
+    def initialize_bin_to_ab_array(self):
+        array = []
+        for a_bin in range(0, self.a_num_partitions):
+            for b_bin in range(0, self.b_num_partitions):
+                a, b = self.bin_to_discrete_ab(a_bin, b_bin)
+                array.append([a, b])
+        array = np.array(array, dtype=np.float32)
+        np.save("bin_to_ab_array", array)
     
     def initialize_pixel_weights(self):
         w = ((1 - self.LAMBDA) * self.p) + (self.LAMBDA / self.Q)
@@ -55,7 +66,6 @@ class MultinomialCrossEntropyLoss:
         expected_w = np.dot(self.p, w)
         output = w / expected_w
         return ndimage.gaussian_filter(input=output, sigma=self.SIGMA)
-
 
     def ab_to_discrete_bin(self, a, b):
         # Convert single pixel a, b to bin id (a_bin, b_bin)
@@ -185,3 +195,6 @@ class MultinomialCrossEntropyLoss:
         product = tf.tensordot(v, crossentropy_loss, axes=3)
         loss = -product
         return loss
+
+    if __name__ == "__main__":
+        temp = MultinomialCrossEntropyLoss(tf.constant(1))
