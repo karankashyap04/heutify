@@ -7,8 +7,8 @@ import pickle
 
 class MultinomialCrossEntropyLoss:
     def __init__(self, y_true):
-        # self.LAMBDA = 0.5 # Value suggested in the paper
-        # self.SIGMA = 5 # Value suggested in the paper
+        self.LAMBDA = 0.5 # Value suggested in the paper
+        self.SIGMA = 5 # Value suggested in the paper
 
         # # TODO: Fill these out
         # # self.a_minimum, self.a_maximum = None, None
