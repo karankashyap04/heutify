@@ -19,9 +19,9 @@ class MultinomialCrossEntropyLoss:
         # # self.a_num_partitions, self.b_num_partitions = None, None # I think each of these should be 23 so that self.Q can be self.a_num_partitions * self.b_num_partitions
         self.a_num_partitions, self.b_num_partitions = 23, 23
 
-        self.Q = 23 ** 2 # We had done 23 x 23 for the Lab colorspace in our model; can change if required
-        self.ab_to_bin_distribution = dict()
-        self.initialize_ab_to_bin_distribution()
+        # self.Q = 23 ** 2 # We had done 23 x 23 for the Lab colorspace in our model; can change if required
+        # self.ab_to_bin_distribution = dict()
+        # self.initialize_ab_to_bin_distribution()
 
         # TODO: Fill these out
         # self.p = None # This will store the bin distribution for all the bins
