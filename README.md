@@ -6,8 +6,6 @@ This project entails a deep neural network implementation for colorizing black a
 
 It is based on the ideas proposed by Zhang et. al in their [paper](https://arxiv.org/pdf/1603.08511v5.pdf).
 
-<br>
-
 ## Packages and Frameworks
 
 This code was written using TensorFlow and the Keras API. There are, however, a few other dependencies, which can all be installed using the `requirements.txt` file. <br> Just navigate to this project directory in your terminal and run
@@ -16,7 +14,9 @@ This code was written using TensorFlow and the Keras API. There are, however, a 
 pip install -r requirements.txt
 ```
 
-<br>
+## Dataset
+
+The dataset used in this project was the Intel Image Classification Dataset. The shapes of the images in this dataset are `150 x 150`, and if you use a different dataset, some of the values would have to be adjusted accordingly.
 
 ## Running the model with the custom Multinomial Cross-Entropy loss function
 
@@ -76,8 +76,6 @@ def display_img(img):
 
 display_img(tf.squeeze(colorized_img))
 ```
-
-<br>
 
 ## Running the model with Mean Squared Error (MSE) loss
 
