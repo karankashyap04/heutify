@@ -71,7 +71,7 @@ jupyterlab-pygments @ file:///home/conda/feedstock_root/build_artifacts/jupyterl
 jupyterlab-widgets @ file:///home/conda/feedstock_root/build_artifacts/jupyterlab_widgets_1662157840858/work
 jupyterlab_server @ file:///home/conda/feedstock_root/build_artifacts/jupyterlab_server_1665686629850/work
 kaggle==1.5.12
-keras==2.10.0
+keras==2.11.0
 Keras-Preprocessing @ file:///home/conda/feedstock_root/build_artifacts/keras-preprocessing_1610713559828/work
 kiwisolver @ file:///Users/runner/miniforge3/conda-bld/kiwisolver_1657953144922/work
 libclang==14.0.6
@@ -143,12 +143,12 @@ six @ file:///home/conda/feedstock_root/build_artifacts/six_1620240208055/work
 sniffio @ file:///home/conda/feedstock_root/build_artifacts/sniffio_1662051266223/work
 soupsieve @ file:///home/conda/feedstock_root/build_artifacts/soupsieve_1658207591808/work
 stack-data @ file:///home/conda/feedstock_root/build_artifacts/stack_data_1664126450622/work
-tensorboard==2.10.1
+tensorboard==2.11.0
 tensorboard-data-server @ file:///Users/runner/miniforge3/conda-bld/tensorboard-data-server_1649932875354/work/tensorboard_data_server-0.6.0-py3-none-macosx_10_9_x86_64.whl
 tensorboard-plugin-wit @ file:///home/conda/feedstock_root/build_artifacts/tensorboard-plugin-wit_1641458951060/work/tensorboard_plugin_wit-1.8.1-py3-none-any.whl
-tensorflow==2.10.0
+tensorflow==2.11.0
 tensorflow-datasets @ file:///home/conda/feedstock_root/build_artifacts/tensorflow-datasets_1665032537013/work
-tensorflow-estimator==2.10.0
+tensorflow-estimator==2.11.0
 tensorflow-io-gcs-filesystem==0.27.0
 tensorflow-metadata @ file:///home/conda/feedstock_root/build_artifacts/tensorflow-metadata_1661966291611/work/tensorflow_metadata-1.10.0-py3-none-any.whl
 tensorflow-probability==0.18.0
