@@ -1,2 +1,15 @@
 data/intel-image-classification-dataset/
 preprocessed_data/
+mse_forest_model/
+mse_incorrect_forest_model/
+small_model/
+final_models.ipynb
+model_with_basic_loss.ipynb
+trying.ipynb
+.vscode/
+colorizer/loss/__pycache__/
+colorizer/loss/complex_loss_model/
+colorizer/loss/model_with_complex_loss/
+colorizer/loss/multinomial_loss_forest_model/
+colorizer/loss/ab_to_bin_distribution.pkl
+colorizer/loss/bin_to_ab_array.npy
