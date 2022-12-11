@@ -34,3 +34,22 @@ class ReducedCNNModel:
         ])
 
         return model
+    
+    def h(self, predicted_img, values, T=0.38):
+        """
+        Takes the model output (predicted_img) and converts the probability
+        distribution across discrete bins for each pixel into a and b channel
+        values for each pixel.
+
+        params:
+        predicted_img -> the model's output, a probability distribution over
+                        self.classes_count bins for each pixel
+        values -> the distribution of a and b channel values over the bins, which
+                    was initially computed using the training labels and stored
+                    in the file 'bin_to_ab_array.npy'
+        T -> temperature - this term was used as a scaling factor in the original
+            paper (with a suggested value of 0.38)
+        """
+        probabilities = tf.nn.softmax(predicted_img / T)
+        expected_value = tf.matmul(probabilities, values)
+        return expected_value

@@ -35,7 +35,7 @@ class ReducedCNNModelMSE:
 
         return model
     
-    def mse_loss(truth, pred):
+    def mse_loss(self, truth, pred):
         """
         Computes the mean squared error loss between the true and predicted
         values.
