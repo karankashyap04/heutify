@@ -15,8 +15,8 @@ Next, you need to remove the _L_ channel values from `y` and add an extra axis
 to the end of `X` (if the shapes match what we have above):
 
 ```python
-X = tf.expand_dims(x, 3)
-y = y[:,:,:,1:]
+X = tf.expand_dims(x, 3) # shape: (dataset_size, 150, 150, 1)
+y = y[:,:,:,1:] # shape: (dataset_size, 150, 150, 2)
 ```
 
 Now, you can get, compile, and fit your model:
