@@ -1,5 +1,23 @@
 # red-greeNN-blue
 
+## Overview
+
+This project entails a deep neural network implementation for colorizing black and white images via multinomial classification and color rebalancing using an intermediate quantized color space and a custom loss function.
+
+It is based on the ideas proposed by Zhang et. al in their [paper](https://arxiv.org/pdf/1603.08511v5.pdf).
+
+<br>
+
+## Packages and Frameworks
+
+This code was written using TensorFlow and the Keras API. There are, however, a few other dependencies, which can all be installed using the `requirements.txt` file. <br> Just navigate to this project directory in your terminal and run
+
+```bash
+pip install -r requirements.txt
+```
+
+<br>
+
 ## Running the model with the custom Multinomial Cross-Entropy loss function
 
 _Note: the steps written here are with the context of the reduced CNN model, however, the steps would be exactly the same if the complete original CNN model (in `cnn_model.py`) was being used; we would just create an instance of the `CNNModel` class instead_.
@@ -37,6 +55,7 @@ model.fit(X_mini, y_mini, verbose=1, batch_size=10, epochs=5)
 ```
 
 Once this is done, you can get colorized versions of new images like this:
+
 ```python
 vals = np.load('bin_to_ab_array.npy') # Note: this np.load line does not need to be run repeatedly for each image you predict; just once before you predict on new images
 image = some_image # assuming this is some black-and-white image with shape (1, 150, 150, 1)
