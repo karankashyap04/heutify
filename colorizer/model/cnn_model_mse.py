@@ -34,3 +34,15 @@ class ReducedCNNModelMSE:
         ])
 
         return model
+    
+    def mse_loss(truth, pred):
+        """
+        Computes the mean squared error loss between the true and predicted
+        values.
+
+        params:
+        truth -> the ground truth values (labels)
+        pred -> the values predicted by the model
+        """
+        loss = tf.reduce_mean(tf.math.square(truth - pred))
+        return loss
