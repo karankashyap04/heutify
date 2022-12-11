@@ -16,7 +16,9 @@ pip install -r requirements.txt
 
 ## Dataset
 
-The dataset used in this project was the Intel Image Classification Dataset. The shapes of the images in this dataset are `150 x 150`, and if you use a different dataset, some of the values would have to be adjusted accordingly.
+The dataset used in this project was the Intel Image Classification Dataset. The shapes of the images in this dataset are `150 x 150`, and if you use a different dataset, some of the values would have to be adjusted accordingly. <br>
+
+We preprocessed the images in this dataset using the code in `preprocessing.py`. Based on the dataset you use, you can adapt the filepaths in `preprocessing.py` and preprocess your images by running that file using its main method.
 
 ## Running the model with the custom Multinomial Cross-Entropy loss function
 
