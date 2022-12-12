@@ -13,3 +13,4 @@ colorizer/loss/model_with_complex_loss/
 colorizer/loss/multinomial_loss_forest_model/
 colorizer/loss/ab_to_bin_distribution.pkl
 colorizer/loss/bin_to_ab_array.npy
+final_check.ipynb

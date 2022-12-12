@@ -24,20 +24,27 @@ We preprocessed the images in this dataset using the code in `preprocessing.py`.
 
 _Note: the steps written here are with the context of the reduced CNN model, however, the steps would be exactly the same if the complete original CNN model (in `cnn_model.py`) was being used; we would just create an instance of the `CNNModel` class instead_.
 
+_Note: before anything else, you must import tensorflow and numpy:_
+
+```python
+import tensorflow as tf
+import numpy as np
+```
+
 First, you must get the data you want to use to train your model.
 If, for example, you are using all of the inputs that were preprocessed by
 `preprocessing.py`, this would look something like this:
 
 ```python
-X = np.load("preprocessed_data/inputs.npy") # shape: (dataset_size, 150, 150)
-y = np.load("preprocessed_data/labels.npy") # shape: (dataset_size, 150, 150, 3)
+X = np.load("preprocessed_data/intel-dataset/inputs.npy") # shape: (dataset_size, 150, 150)
+y = np.load("preprocessed_data/intel-dataset/labels.npy") # shape: (dataset_size, 150, 150, 3)
 ```
 
 Next, you need to remove the _L_ channel values from `y` and add an extra axis
 to the end of `X` (if the shapes match what we have above):
 
 ```python
-X = tf.expand_dims(x, 3) # shape: (dataset_size, 150, 150, 1)
+X = tf.expand_dims(X, 3) # shape: (dataset_size, 150, 150, 1)
 y = y[:,:,:,1:] # shape: (dataset_size, 150, 150, 2)
 ```
 
@@ -53,7 +60,7 @@ Now, you can get, compile, and fit your model:
 model_class = ReducedCNNModel()
 model = model_class.get_cnn_colorizer_model()
 model.compile(optimizer=tf.keras.optimizers.Adam(0.01), loss=loss_class.loss, run_eagerly=True)
-model.fit(X_mini, y_mini, verbose=1, batch_size=10, epochs=5)
+model.fit(X, y, verbose=1, batch_size=10, epochs=5)
 ```
 
 Once this is done, you can get colorized versions of new images like this:
@@ -71,6 +78,8 @@ colorized_img = tf.concat([image, h_result], 3)
 In order to display this image, you can run:
 
 ```python
+from skimage import color
+from PIL import Image
 def display_img(img):
     final_output_img_rgb = (color.lab2rgb(img) * 255).astype(np.uint8)
     pli_img = Image.fromarray(final_output_img_rgb)
@@ -81,20 +90,27 @@ display_img(tf.squeeze(colorized_img))
 
 ## Running the model with Mean Squared Error (MSE) loss
 
+_Note: before anything else, you must import tensorflow and numpy:_
+
+```python
+import tensorflow as tf
+import numpy as np
+```
+
 First, you must get the data you want to use to train your model.
 If, for example, you are using all of the inputs that were preprocessed by
 `preprocessing.py`, this would look something like this:
 
 ```python
-X = np.load("preprocessed_data/inputs.npy") # shape: (dataset_size, 150, 150)
-y = np.load("preprocessed_data/labels.npy") # shape: (dataset_size, 150, 150, 3)
+X = np.load("preprocessed_data/intel-dataset/inputs.npy") # shape: (dataset_size, 150, 150)
+y = np.load("preprocessed_data/intel-dataset/labels.npy") # shape: (dataset_size, 150, 150, 3)
 ```
 
 Next, you need to remove the _L_ channel values from `y` and add an extra axis
 to the end of `X` (if the shapes match what we have above):
 
 ```python
-X = tf.expand_dims(x, 3) # shape: (dataset_size, 150, 150, 1)
+X = tf.expand_dims(X, 3) # shape: (dataset_size, 150, 150, 1)
 y = y[:,:,:,1:] # shape: (dataset_size, 150, 150, 2)
 ```
 
@@ -118,6 +134,8 @@ colorized_img = tf.concat([image, output_img], 3)
 In order to display this image, you can run:
 
 ```python
+from skimage import color
+from PIL import Image
 def display_img(img):
     final_output_img_rgb = (color.lab2rgb(img) * 255).astype(np.uint8)
     pli_img = Image.fromarray(final_output_img_rgb)
