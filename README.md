@@ -15,6 +15,8 @@ Below you can see some of the sample results produced by our model. The image on
 
 <img src="./sample_results/forest_bw.png" width="20%"> <img src="./sample_results/forest_colored.png" width="20%">
 
+<img src="./sample_results/forest2_bw.png" width="20%"> <img src="./sample_results/forest2_colored.png" width="20%">
+
 
 ## Packages and Frameworks
 
