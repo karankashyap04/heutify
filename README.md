@@ -6,6 +6,16 @@ This project entails a deep neural network implementation for colorizing black a
 
 It is based on the ideas proposed by Zhang et. al in their [paper](https://arxiv.org/pdf/1603.08511v5.pdf).
 
+
+## Sample Results
+
+Below you can see some of the sample results produced by our model. The image on the left is the black and white image, and the image on the right is the colorized image produced by our model:
+
+<img src="./sample_results/flowers_bw.png" width="20%"> <img src="./sample_results/flowers_colored.png" width="20%">
+
+<img src="./sample_results/forest_bw.png" width="20%"> <img src="./sample_results/forest_colored.png" width="20%">
+
+
 ## Packages and Frameworks
 
 This code was written using TensorFlow and the Keras API. There are, however, a few other dependencies, which can all be installed using the `requirements.txt` file. <br> Just navigate to this project directory in your terminal and run
